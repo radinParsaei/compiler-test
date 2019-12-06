@@ -62,7 +62,7 @@ public class Sample extends BaseClasses.CompilerBase {
     public void afterLex(Parser result) {}
 
 	public void parse(Parser parser) {
-    	parser.on("NUM", "exp", (parser1) -> new SyntaxTree.Number(Double.parseDouble(parser.getTokens().get(0).getText())));
+//    	parser.on("NUM", "exp", (parser1) -> new SyntaxTree.Number(Double.parseDouble(parser.getTokens().get(0).getText())));
 	}
 
 	@ParserEvent("exp : NUM")
@@ -115,9 +115,13 @@ public class Sample extends BaseClasses.CompilerBase {
 			for (Token token : result.getTokens()) {
 				if (token.getName().equals("program")){
 					if (token.getObject() instanceof SyntaxTree.Repeat){
-						for (int i = 0; i < Integer.parseInt(token.getObject().toString().split("\t")[1]); i++) {
-							System.out.println(token.getObject().toString().split("\t")[0]);
-						}
+                        int count = 1;
+                        for (int i = 1; i < token.getObject().toString().split("\t").length; i++) {
+                            count *= Integer.parseInt(token.getObject().toString().split("\t")[i]);
+                        }
+                        for (; count > 0; count--) {
+                            System.out.println(token.getObject().toString().split("\t")[0]);
+                        }
 					} else {
 						System.out.println(token.getObject());
 					}
