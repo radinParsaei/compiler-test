@@ -1,4 +1,4 @@
-package Main;
+package Sample;
 
 import java.io.File;
 import java.io.FileNotFoundException;

@@ -1,4 +1,4 @@
-package Main;
+package Sample;
 
 public class Main extends CompilerMain {
 	public static void main(String [] args) {

@@ -1,4 +1,4 @@
-package Main;
+package Sample;
 
 public class SyntaxTree {
 	public static class Number extends BaseClasses.SyntaxTreeBase {

@@ -1,4 +1,4 @@
-package Main;
+package Sample;
 
 import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;

@@ -1,6 +1,4 @@
-package Main;
-
-import java.util.ArrayList;
+package Sample;
 
 public class Token {
     private String name;
