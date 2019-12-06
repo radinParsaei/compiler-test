@@ -28,7 +28,7 @@ public class Sample extends BaseClasses.CompilerBase {
 
 	public String getInputCode() {
 		File file = new File(fileName);
-		Scanner scanner = null;
+		Scanner scanner;
 		try {
 			scanner = new Scanner(file);
 		} catch (FileNotFoundException e) {
@@ -41,16 +41,16 @@ public class Sample extends BaseClasses.CompilerBase {
     }
 
     public void initLexer(Lexer lexer) {
-        //Number
-        lexer.add("NUM", "(-|\\+)?\\d+\\.?\\d*");
-        //Text
-        lexer.add("TXT", "\".*?(\")|\'.*?(\')");
-        //operations
+		//Number
+		lexer.add("NUM", "(-|\\+)?\\d+\\.?\\d*");
+		//Text
+		lexer.add("TXT", "\".*?(\")|\'.*?(\')");
+		//operations
 		lexer.add("OPERATIONS1", "\\*|\\/");
 		lexer.add("OPERATIONS2", "\\-|\\+");
-        //spaces (ignore)
-        lexer.add("IGNORE", "[ \t]+");
-        lexer.addRemoveString("\n");
+		//spaces (ignore)
+		lexer.add("IGNORE", "[ \t]+");
+		lexer.addRemoveString("\n");
 		//print
 		lexer.add("PRINT", "print ");
 		//repeat
@@ -122,7 +122,7 @@ public class Sample extends BaseClasses.CompilerBase {
 						System.out.println(token.getObject());
 					}
 				} else if (token.getName().startsWith("REMOVABLE")){
-
+                    //do nothing
 				} else {
 					syntaxError("Error in your syntax");
 					break;
