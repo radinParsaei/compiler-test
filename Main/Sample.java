@@ -49,7 +49,7 @@ public class Sample extends BaseClasses.CompilerBase {
 		lexer.add("OPERATIONS2", "\\-|\\+");
 		//spaces (ignore)
 		lexer.add("IGNORE", "[ \t]+");
-		lexer.addRemoveString("\n");
+        lexer.addNonRegex("NEW_LINE", "\n");
 		//print
 		lexer.add("PRINT", "print ");
 		//repeat
@@ -104,7 +104,7 @@ public class Sample extends BaseClasses.CompilerBase {
 		return new SyntaxTree.Print((BaseClasses.SyntaxTreeBase) parser.getTokens().get(1).getObject());
 	}
 
-	@ParserEvent("program : REPEAT exp REMOVABLE0 program")
+    @ParserEvent("program : REPEAT exp NEW_LINE program")
 	public Object repeat(Parser parser) {
 		return new SyntaxTree.Repeat((BaseClasses.SyntaxTreeBase) parser.getTokens().get(3).getObject(), (BaseClasses.SyntaxTreeBase) parser.getTokens().get(1).getObject());
 	}

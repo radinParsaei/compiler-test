@@ -10,12 +10,12 @@ import java.util.regex.Pattern;
 public class Lexer {
 	private BaseClasses.CompilerBase compiler;
     private HashMap<String, String> lexerConfs;
-    private ArrayList<String> removables;
+    private HashMap<String, String> nonRegexes;
 
     public Lexer(BaseClasses.CompilerBase compiler){
         this.lexerConfs = new HashMap<>();
         this.compiler = compiler;
-        this.removables = new ArrayList<>();
+        this.nonRegexes = new HashMap<>();
     }
 
     public void add(String name, String regex){
@@ -32,13 +32,11 @@ public class Lexer {
     }
 
     public Token getToken(String input){
-        int i = 0;
-        for (String toRemove : removables) {
-            if (input.startsWith(toRemove)) {
-                return new Token("REMOVABLE" + i, toRemove);
+        for (Map.Entry conf : nonRegexes.entrySet()) {
+            if (input.startsWith((String) conf.getValue())) {
+                return new Token((String) conf.getKey(), (String) conf.getValue());
             }
-            input = input.replace(toRemove, "");
-            i++;
+            input = input.replace((CharSequence) conf.getValue(), "");
         }
         for (Map.Entry conf : lexerConfs.entrySet()) {
             if(Pattern.matches("^" + conf.getValue() + ".*", input)){
@@ -48,8 +46,8 @@ public class Lexer {
         return new Token();
     }
 
-    void addRemoveString(String toRemove){
-        removables.add(toRemove);
+    void addNonRegex(String name, String string) {
+        nonRegexes.put(name, string);
     }
 
     public ArrayList<Token> lex(String input){
