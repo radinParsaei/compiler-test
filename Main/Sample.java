@@ -14,9 +14,9 @@ public class Sample extends BaseClasses.CompilerBase {
 		return lines;
 	}
 
-	public Sample(String [] args) {
+	public Sample(String fileName) {
 		try {
-			this.fileName = args[0];
+			this.fileName = fileName;
 		} catch(ArrayIndexOutOfBoundsException e){
 			System.err.println("please set the file name");
 			System.exit(1);
@@ -28,16 +28,15 @@ public class Sample extends BaseClasses.CompilerBase {
 
 	public String getInputCode() {
 		File file = new File(fileName);
-		Scanner scanner;
+		Scanner scanner = null;
 		try {
 			scanner = new Scanner(file);
 		} catch (FileNotFoundException e) {
 			System.err.println("Can\'t open the file");
-			return new Scanner(System.in).nextLine();
+			System.exit(1);
 		}
 		scanner.useDelimiter("\\Z");
 		return scanner.next();
-//		return "repeat 10 \n print 10";
     }
 
     public void initLexer(Lexer lexer) {

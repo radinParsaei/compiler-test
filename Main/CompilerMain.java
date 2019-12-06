@@ -11,12 +11,7 @@ public class CompilerMain {
 		} catch (InstantiationException | IllegalAccessException e) {
 			e.printStackTrace();
 		}
-		Lexer lexer = new Lexer(compiler);
-		compiler.initLexer(lexer);
-		ArrayList<Token> result = lexer.lex(compiler.getInputCode());
-		Parser parser = new Parser(result);
-		parser.remove("IGNORE");
-		compiler.afterLex(parser);
+		Parser parser = lex(compiler);
 		try {
 			compiler.parse(parser);
 		} catch (Exception e) {
@@ -33,15 +28,31 @@ public class CompilerMain {
 				}
 			}
 		} catch (IllegalArgumentException | IllegalAccessException | InvocationTargetException | NoSuchMethodException e) {
-		e.printStackTrace();
-	} catch (NullPointerException e) {
-		//Annotation ParserEvent not set for this function
-	}
-        try {
+			e.printStackTrace();
+		} catch (NullPointerException e) {
+			//Annotation ParserEvent not set for this function
+		}
+		try {
 			compiler.parse(parser);
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
-        compiler.afterParse(parser);
+		compiler.afterParse(parser);
+	}
+
+	public static Parser lex(BaseClasses.CompilerBase compiler) {
+		Object compilerInstance = null;
+		try {
+			compilerInstance = compiler.getClass().newInstance();
+		} catch (InstantiationException | IllegalAccessException e) {
+			e.printStackTrace();
+		}
+		Lexer lexer = new Lexer(compiler);
+		compiler.initLexer(lexer);
+		ArrayList<Token> result = lexer.lex(compiler.getInputCode());
+		Parser parser = new Parser(result);
+		parser.remove("IGNORE");
+		compiler.afterLex(parser);
+		return parser;
 	}
 }
