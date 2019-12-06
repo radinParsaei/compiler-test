@@ -30,7 +30,7 @@ public class Parser {
 		return tmp;
 	}
 
-	public void on(String model, String newName, CompilerLambda lambda) {
+	public void on(String model, String newName, CompilerLambda lambda) {//replace previous model with newName and store lambda output on it Object
 		String map = this.getMap();
 		int index = map.indexOf(model);
 		if(index < 0) {
@@ -60,7 +60,7 @@ public class Parser {
 		}
 	}
 
-	public void on(String model, String newName, Object parentOfMethod, String methodName) throws IllegalAccessException, IllegalArgumentException, InvocationTargetException, NoSuchMethodException, SecurityException {
+	public void on(String model, String newName, Object parentOfMethod, String methodName) throws IllegalAccessException, IllegalArgumentException, InvocationTargetException, NoSuchMethodException, SecurityException {//replace previous model with newName and store method output on it Object
 		String map = this.getMap();
 		int index = map.indexOf(model);
 		if(index < 0) {
