@@ -62,7 +62,7 @@ public class Sample extends BaseClasses.CompilerBase {
     public void afterLex(Parser result) {}
 
 	public void parse(Parser parser) {
-//    	parser.on("NUM", "exp", (parser1) -> new SyntaxTree.Number(Double.parseDouble(parser.getTokens().get(0).getText())));
+//    	parser.on("NUM", "exp", (parser1) -> new SyntaxTree.Number(Double.parseDouble(parser1.getTokens().get(0).getText())));
 	}
 
 	@ParserEvent("exp : NUM")
