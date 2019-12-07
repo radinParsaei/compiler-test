@@ -4,7 +4,7 @@ This project is a very small framework written in java you can make a compiler w
 
 edit `Sample.java` file, `Main.java` and `SyntaxTree.java` to make your compiler
 
-in Sample.java and in initLexer function you get a lever object and you must to init and add configs for this object
+in Sample.java and in initLexer function you get a lexer object and you must to init and add configs for this object
 
 after lexing the code function `afterLex(Parser)` runs. in this function you have inited parser with lexed code
 
