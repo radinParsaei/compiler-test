@@ -6,7 +6,7 @@ edit `Sample.java` file, `Main.java` and `SyntaxTree.java` to make your compiler
 
 in Sample.java and in initLexer function you get a lever object and you must to init and add configs for this object
 
-after lexing the code function `afterLex(Parser)` runs. in this function you have inited parser with sexed code
+after lexing the code function `afterLex(Parser)` runs. in this function you have inited parser with lexed code
 
 in `parse` you must to parse code uses `parser.on()` function
 
