@@ -1,16 +1,14 @@
-package Sample;
-
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.util.ArrayList;
 import java.util.Scanner;
 import java.util.regex.Pattern;
 
-public class Sample extends BaseClasses.CompilerBase {
+public class Sample extends CompilerBase {
 	private int lines;
 	private String fileName;
 	
-    public int getLines() {
+	public int getLines() {
 		return lines;
 	}
 
@@ -37,9 +35,9 @@ public class Sample extends BaseClasses.CompilerBase {
 		}
 		scanner.useDelimiter("\\Z");
 		return scanner.next();
-    }
+	}
 
-    public void initLexer(Lexer lexer) {
+	public void initLexer(Lexer lexer) {
 		//Number
 		lexer.add("NUM", "(-|\\+)?\\d+\\.?\\d*");
 		//Text
@@ -49,16 +47,16 @@ public class Sample extends BaseClasses.CompilerBase {
 		lexer.add("OPERATIONS2", "\\-|\\+");
 		//spaces (ignore)
 		lexer.add("IGNORE", "[ \t]+");
-        lexer.addNonRegex("NEW_LINE", "\n");
+		lexer.addNonRegex("NEW_LINE", "\n");
 		//print
 		lexer.add("PRINT", "print ");
 		//repeat
 		lexer.add("REPEAT", "repeat ");
 		//id
 		lexer.add("ID", "([A-z]+\\d*_?)+");
-    }
+	}
 
-    public void afterLex(Parser result) {}
+	public void afterLex(Parser result) {}
 
 	public void parse(Parser parser) {
 //    	parser.on("NUM", "exp", (parser1) -> new SyntaxTree.Number(Double.parseDouble(parser1.getTokens().get(0).getText())));
@@ -76,10 +74,10 @@ public class Sample extends BaseClasses.CompilerBase {
 
 	@ParserEvent("exp : exp OPERATIONS2 exp")
 	public Object operations2(Parser parser) {
-    	if(Pattern.matches("\\+", parser.getTokens().get(1).getText())) {
-			return new SyntaxTree.Plus((BaseClasses.SyntaxTreeBase) parser.getTokens().get(0).getObject(), (BaseClasses.SyntaxTreeBase) parser.getTokens().get(2).getObject());
+		if(Pattern.matches("\\+", parser.getTokens().get(1).getText())) {
+			return new SyntaxTree.Plus((SyntaxTreeBase) parser.getTokens().get(0).getObject(), (SyntaxTreeBase) parser.getTokens().get(2).getObject());
 		} else if(Pattern.matches("-", parser.getTokens().get(1).getText())) {
-			return new SyntaxTree.Minus((BaseClasses.SyntaxTreeBase) parser.getTokens().get(0).getObject(), (BaseClasses.SyntaxTreeBase) parser.getTokens().get(2).getObject());
+			return new SyntaxTree.Minus((SyntaxTreeBase) parser.getTokens().get(0).getObject(), (SyntaxTreeBase) parser.getTokens().get(2).getObject());
 		}
 		return null;
 	}
@@ -87,57 +85,60 @@ public class Sample extends BaseClasses.CompilerBase {
 	@ParserEvent("exp : exp OPERATIONS1 exp")
 	public Object operations1(Parser parser) {
 		if(Pattern.matches("\\*", parser.getTokens().get(1).getText())) {
-			return new SyntaxTree.Multiply((BaseClasses.SyntaxTreeBase) parser.getTokens().get(0).getObject(), (BaseClasses.SyntaxTreeBase) parser.getTokens().get(2).getObject());
+			return new SyntaxTree.Multiply((SyntaxTreeBase) parser.getTokens().get(0).getObject(), (SyntaxTreeBase) parser.getTokens().get(2).getObject());
 		} else if(Pattern.matches("/", parser.getTokens().get(1).getText())) {
-			return new SyntaxTree.Division((BaseClasses.SyntaxTreeBase) parser.getTokens().get(0).getObject(), (BaseClasses.SyntaxTreeBase) parser.getTokens().get(2).getObject());
+			return new SyntaxTree.Division((SyntaxTreeBase) parser.getTokens().get(0).getObject(), (SyntaxTreeBase) parser.getTokens().get(2).getObject());
 		}
 		return null;
 	}
 
 	@ParserEvent("program : exp")
 	public Object result(Parser parser) {
-		return new SyntaxTree.Result((BaseClasses.SyntaxTreeBase) parser.getTokens().get(0).getObject());
+		return new Runnable(){
+			@Override
+			public void run() {
+				System.out.println("Value is\t" + ((SyntaxTreeBase)parser.getTokens().get(0).getObject()));
+			}
+		};
 	}
 
 	@ParserEvent("program : PRINT exp")
 	public Object print(Parser parser) {
-		return new SyntaxTree.Print((BaseClasses.SyntaxTreeBase) parser.getTokens().get(1).getObject());
+		return new Runnable(){
+			@Override
+			public void run() {
+				System.out.println(((SyntaxTreeBase)parser.getTokens().get(1).getObject()));
+			}
+		};
 	}
 
-    @ParserEvent("program : REPEAT exp NEW_LINE program")
+	@ParserEvent("program : REPEAT exp NEW_LINE program")
 	public Object repeat(Parser parser) {
-		return new SyntaxTree.Repeat((BaseClasses.SyntaxTreeBase) parser.getTokens().get(3).getObject(), (BaseClasses.SyntaxTreeBase) parser.getTokens().get(1).getObject());
+		// return new SyntaxTree.Repeat((SyntaxTreeBase) parser.getTokens().get(3).getObject(), (SyntaxTreeBase) parser.getTokens().get(1).getObject());
+		return new Runnable(){
+			@Override
+			public void run() {
+				for (int i = 0; i < Integer.parseInt(parser.getTokens().get(1).getObject().toString()); i++) {
+					((Runnable)parser.getTokens().get(3).getObject()).run();
+				}
+			}
+		};
 	}
 
 	public void afterParse(Parser result) {
-		if(result.getTokens().size() > 0) {
-			for (Token token : result.getTokens()) {
-				if (token.getName().equals("program")){
-					if (token.getObject() instanceof SyntaxTree.Repeat){
-                        int count = 1;
-                        for (int i = 1; i < token.getObject().toString().split("\t").length; i++) {
-                            count *= Integer.parseInt(token.getObject().toString().split("\t")[i]);
-                        }
-                        for (; count > 0; count--) {
-                            System.out.println(token.getObject().toString().split("\t")[0]);
-                        }
-					} else {
-						System.out.println(token.getObject());
-					}
-				} else if (token.getName().startsWith("REMOVABLE")){
-                    //do nothing
-				} else {
-					syntaxError("Error in your syntax");
-					break;
-				}
+		result.remove("NEW_LINE");
+		for (Token token : result.getTokens()) {
+			if (token.getName().equals("program")) {
+				((Runnable)token.getObject()).run();
+			} else {
+				syntaxError("Syntax Error");
+				break;
 			}
-		} else {
-			System.err.println("Error");
 		}
 	}
 
 	public ArrayList<String> listAll(){
-    	ArrayList<String> arrayList = new ArrayList<>();
+		ArrayList<String> arrayList = new ArrayList<>();
 		arrayList.add("number");
 		arrayList.add("text");
 		arrayList.add("operations1");
@@ -145,7 +146,7 @@ public class Sample extends BaseClasses.CompilerBase {
 		arrayList.add("print");
 		arrayList.add("repeat");
 		arrayList.add("result");
-    	return arrayList;
+		return arrayList;
 	}
 
 	public static void syntaxError(int errorChar, String line) {

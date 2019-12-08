@@ -1,10 +1,8 @@
-package Sample;
-
 import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
 
 public class CompilerMain {
-	public static void compile(BaseClasses.CompilerBase compiler) {
+	public static void compile(CompilerBase compiler) {
 		Object compilerInstance = null;
 		try {
 			compilerInstance = compiler.getClass().newInstance();
@@ -40,7 +38,7 @@ public class CompilerMain {
 		compiler.afterParse(parser);
 	}
 
-	public static Parser lex(BaseClasses.CompilerBase compiler) {
+	public static Parser lex(CompilerBase compiler) {
 		Object compilerInstance = null;
 		try {
 			compilerInstance = compiler.getClass().newInstance();

@@ -1,7 +1,5 @@
-package Sample;
-
 public class SyntaxTree {
-	public static class Number extends BaseClasses.SyntaxTreeBase {
+	public static class Number extends SyntaxTreeBase {
 		public Number(java.lang.Number data) {
 			this.setData(data);
 			if(((java.lang.Number) this.getData()).doubleValue() == ((java.lang.Number) this.getData()).intValue()){
@@ -11,15 +9,15 @@ public class SyntaxTree {
 		}
 	}
 	
-	public static class Text extends BaseClasses.SyntaxTreeBase {
+	public static class Text extends SyntaxTreeBase {
 		public Text(String data) {
 			this.setData(data.substring(1, data.length() - 1));
 			this.setType("Text");
 		}
 	}
 	
-	public static class Plus extends BaseClasses.SyntaxTreeBase {
-		public Plus(BaseClasses.SyntaxTreeBase value1, BaseClasses.SyntaxTreeBase value2) {
+	public static class Plus extends SyntaxTreeBase {
+		public Plus(SyntaxTreeBase value1, SyntaxTreeBase value2) {
 			if(value1.getType() == "Number" && value2.getType() == "Number") {
 				this.setData(((java.lang.Number)value1.getData()).doubleValue() + ((java.lang.Number)value2.getData()).doubleValue());
 				if((Double)this.getData() == ((Double)this.getData()).intValue()){
@@ -33,8 +31,8 @@ public class SyntaxTree {
 		}
 	}
 
-	public static class Minus extends BaseClasses.SyntaxTreeBase {
-		public Minus(BaseClasses.SyntaxTreeBase value1, BaseClasses.SyntaxTreeBase value2) {
+	public static class Minus extends SyntaxTreeBase {
+		public Minus(SyntaxTreeBase value1, SyntaxTreeBase value2) {
 			if(value1.getType() == "Number" && value2.getType() == "Number") {
 				this.setData(((java.lang.Number)value1.getData()).doubleValue() - ((java.lang.Number)value2.getData()).doubleValue());
 				if((Double)this.getData() == ((Double)this.getData()).intValue()){
@@ -48,7 +46,7 @@ public class SyntaxTree {
 		}
 	}
 	
-	public static class Multiply extends BaseClasses.SyntaxTreeBase {
+	public static class Multiply extends SyntaxTreeBase {
 		private String stringMultiply(String string, int times) {
 			String result = "";
 			for(int i = 0; i < times; i++) {
@@ -57,7 +55,7 @@ public class SyntaxTree {
 			return result;
 		}
 
-		public Multiply(BaseClasses.SyntaxTreeBase value1, BaseClasses.SyntaxTreeBase value2) {
+		public Multiply(SyntaxTreeBase value1, SyntaxTreeBase value2) {
 			if(value1.getType().equals("Number") && value2.getType().equals("Number")) {
 				this.setData(((java.lang.Number)value1.getData()).doubleValue() * ((java.lang.Number)value2.getData()).doubleValue());
 				if((Double)this.getData() == ((Double)this.getData()).intValue()){
@@ -65,17 +63,13 @@ public class SyntaxTree {
 				}
 				this.setType("Number");
 			} else if((value1.getType().equals("Number") && value2.getType().equals("Text"))){
-				String tmp = "";
-				double count;
-				count = (Double)this.getData();
-				for(int i = 0; i < count; i++) {
-					tmp += value2;
-				}
-				this.setData(tmp);
+				Double count;
+				count = ((java.lang.Number)value1.getData()).doubleValue();
+				this.setData(this.stringMultiply(value2.getData().toString(), count.intValue()));
 				this.setType("Text");
 			} else if((value1.getType().equals("Text") && value2.getType().equals("Number"))){
 				Double count;
-				count = (Double)value2.getData();
+				count = ((java.lang.Number)value2.getData()).doubleValue();
 				this.setData(this.stringMultiply(value1.getData().toString(), count.intValue()));
 				this.setType("Text");
 			} else {
@@ -86,9 +80,8 @@ public class SyntaxTree {
 		}
 	}
 
-
-	public static class Division extends BaseClasses.SyntaxTreeBase {
-		public Division(BaseClasses.SyntaxTreeBase value1, BaseClasses.SyntaxTreeBase value2) {
+	public static class Division extends SyntaxTreeBase {
+		public Division(SyntaxTreeBase value1, SyntaxTreeBase value2) {
 			if (value1.getType().equals("Number") && value2.getType().equals("Number")) {
 				this.setData(((java.lang.Number) value1.getData()).doubleValue() / ((java.lang.Number) value2.getData()).doubleValue());
 				if ((Double) this.getData() == ((Double) this.getData()).intValue()) {
@@ -100,28 +93,6 @@ public class SyntaxTree {
 				this.setType("Text");
 				this.setData("None");
 			}
-		}
-	}
-
-	public static class Result extends BaseClasses.SyntaxTreeBase {
-		public Result(BaseClasses.SyntaxTreeBase value) {
-			this.setData("value is " + value);
-		}
-
-		public Result(BaseClasses.SyntaxTreeBase value, long line) {
-			this.setData("value is " + value + " in line " + line);
-		}
-	}
-
-	public static class Print extends BaseClasses.SyntaxTreeBase {
-		public Print(BaseClasses.SyntaxTreeBase value) {
-			this.setData(value + "");
-		}
-	}
-
-	public static class Repeat extends BaseClasses.SyntaxTreeBase {
-		public Repeat(BaseClasses.SyntaxTreeBase value, BaseClasses.SyntaxTreeBase count) {
-			this.setData(value + "\t" + count);
 		}
 	}
 }
