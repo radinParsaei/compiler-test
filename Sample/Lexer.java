@@ -7,13 +7,10 @@ import java.util.regex.Pattern;
 
 public class Lexer {
 	private CompilerBase compiler;
-	private HashMap<String, String> lexerConfs;
-	private HashMap<String, String> nonRegexes;
+	private HashMap<String, String> lexerConfs = new HashMap<>();
 
 	public Lexer(CompilerBase compiler){
-		this.lexerConfs = new HashMap<>();
 		this.compiler = compiler;
-		this.nonRegexes = new HashMap<>();
 	}
 
 	public void add(String name, String regex){
@@ -21,7 +18,7 @@ public class Lexer {
 	}
 
 	private String findFromText(String text, String regex) {
-		Pattern p = Pattern.compile(lexerConfs.get(regex));
+		Pattern p = Pattern.compile("^" + lexerConfs.get(regex));
 		Matcher m = p.matcher(text);
 		if (m.find()) {
 			return m.group(0);
@@ -30,22 +27,12 @@ public class Lexer {
 	}
 
 	public Token getToken(String input){
-		for (Map.Entry conf : nonRegexes.entrySet()) {
-			if (input.startsWith((String) conf.getValue())) {
-				return new Token((String) conf.getKey(), (String) conf.getValue());
-			}
-			input = input.replace((CharSequence) conf.getValue(), "");
-		}
 		for (Map.Entry conf : lexerConfs.entrySet()) {
-			if(Pattern.matches("^" + conf.getValue() + ".*", input)){
+			if (!findFromText(input, conf.getKey().toString()).equals("")) {//Pattern.matches("^" + conf.getValue() + ".*", input)
 				return new Token((String) conf.getKey(), findFromText(input, conf.getKey().toString()));
 			}
 		}
 		return new Token();
-	}
-
-	void addNonRegex(String name, String string) {
-		nonRegexes.put(name, string);
 	}
 
 	public ArrayList<Token> lex(String input){

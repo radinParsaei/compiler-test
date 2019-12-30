@@ -1,3 +1,5 @@
+import java.util.HashMap;
+
 public class SyntaxTree {
 	public static class Number extends SyntaxTreeBase {
 		public Number(java.lang.Number data) {
@@ -93,6 +95,20 @@ public class SyntaxTree {
 				this.setType("Text");
 				this.setData("None");
 			}
+		}
+	}
+
+	public static class Variable extends SyntaxTreeBase {
+		private HashMap<String, SyntaxTreeBase> variables;
+		private String variableName;
+		public Variable(HashMap variables, String variableName) {
+			this.variables = variables;
+			this.variableName = variableName;
+		}
+
+		@Override
+		public Object getData() {
+			return variables.get(variableName);
 		}
 	}
 }

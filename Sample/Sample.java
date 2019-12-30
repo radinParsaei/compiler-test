@@ -3,22 +3,19 @@ import java.io.FileNotFoundException;
 import java.util.ArrayList;
 import java.util.Scanner;
 import java.util.regex.Pattern;
+import java.util.HashMap;
 
 public class Sample extends CompilerBase {
 	private int lines;
 	private String fileName;
+	private HashMap<String, SyntaxTreeBase> variables = new HashMap<>();
 	
 	public int getLines() {
 		return lines;
 	}
 
 	public Sample(String fileName) {
-		try {
-			this.fileName = fileName;
-		} catch(ArrayIndexOutOfBoundsException e){
-			System.err.println("please set the file name");
-			System.exit(1);
-		}
+		this.fileName = fileName;
 	}
 
 	public Sample() {
@@ -38,22 +35,23 @@ public class Sample extends CompilerBase {
 	}
 
 	public void initLexer(Lexer lexer) {
-		//Number
-		lexer.add("NUM", "(-|\\+)?\\d+\\.?\\d*");
 		//Text
 		lexer.add("TXT", "\".*?(\")|\'.*?(\')");
+		//Number
+		lexer.add("NUM", "(-|\\+)?\\d+\\.?\\d*");
 		//operations
 		lexer.add("OPERATIONS1", "\\*|\\/");
 		lexer.add("OPERATIONS2", "\\-|\\+");
 		//spaces (ignore)
-		lexer.add("IGNORE", "[ \t]+");
-		lexer.addNonRegex("NEW_LINE", "\n");
+		lexer.add("IGNORE", "[ \\s]+");
 		//print
 		lexer.add("PRINT", "print ");
 		//repeat
 		lexer.add("REPEAT", "repeat ");
 		//id
-		lexer.add("ID", "([A-z]+\\d*_?)+");
+		lexer.add("ID", "([A-Za-z]+\\d*_*)+");
+		//set
+		lexer.add("SET", "=");
 	}
 
 	public void afterLex(Parser result) {}
@@ -90,6 +88,21 @@ public class Sample extends CompilerBase {
 			return new SyntaxTree.Division((SyntaxTreeBase) parser.getTokens().get(0).getObject(), (SyntaxTreeBase) parser.getTokens().get(2).getObject());
 		}
 		return null;
+	}
+
+	@ParserEvent("program : ID SET exp")
+	public Object set(Parser parser) {
+		return new Runnable(){
+			@Override
+			public void run() {
+				variables.put(parser.getTokens().get(0).getText(), ((SyntaxTreeBase)parser.getTokens().get(2).getObject()));
+			}
+		};
+	}
+
+	@ParserEvent("exp : ID")
+	public Object variable(Parser parser) {
+		return new SyntaxTree.Variable(variables, parser.getTokens().get(0).getText());
 	}
 
 	@ParserEvent("program : exp")
@@ -143,6 +156,8 @@ public class Sample extends CompilerBase {
 		arrayList.add("text");
 		arrayList.add("operations1");
 		arrayList.add("operations2");
+		arrayList.add("set");
+		arrayList.add("variable");
 		arrayList.add("print");
 		arrayList.add("repeat");
 		arrayList.add("result");
