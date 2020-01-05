@@ -1,9 +1,12 @@
 public class SyntaxTreeBase {
-	private Object data;
-	private String type = "";
+	protected Object data;
+	protected String type = "";
+	protected Runnable runnable = null;
+
 	public Object getData() {
 		return data;
 	}
+
 	public void setData(Object data) {
 		this.data = data;
 	}
@@ -15,6 +18,15 @@ public class SyntaxTreeBase {
 	public String getType() {
 		return type;
 	}
+
+	protected void setRunnable(Runnable runnable) {
+		this.runnable = runnable;
+	}
+	
+	public Runnable getRunnable() {
+		return runnable;
+	}
+
 	@Override
 	public String toString() {
 		return this.getData().toString();
