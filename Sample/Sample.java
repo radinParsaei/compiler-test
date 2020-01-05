@@ -61,9 +61,13 @@ public class Sample extends CompilerBase {
 		lexer.add("ID", "([A-Za-z]+\\d*_*)+");
 		//set
 		lexer.add("SET", "=");
+		//comment
+		lexer.add("COMMENT", new CommentStringChecker());
 	}
 
-	public void afterLex(Parser result) {}
+	public void afterLex(Parser result) {
+		result.remove("COMMENT");
+	}
 
 	public void parse(Parser parser) {
 //    	parser.on("NUM", "exp", (parser1) -> new SyntaxTree.Number(Double.parseDouble(parser1.getTokens().get(0).getText())));

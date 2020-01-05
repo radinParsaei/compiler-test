@@ -8,6 +8,7 @@ import java.util.regex.Pattern;
 public class Lexer {
 	private CompilerBase compiler;
 	private HashMap<String, String> lexerConfs = new HashMap<>();
+	private HashMap<String, StringCheckerBase> lexerConfsWithStringChecker = new HashMap<>();
 
 	public Lexer(CompilerBase compiler){
 		this.compiler = compiler;
@@ -15,6 +16,10 @@ public class Lexer {
 
 	public void add(String name, String regex){
 		lexerConfs.put(name, "(" + regex + ")");
+	}
+
+	public void add(String name, StringCheckerBase checker){
+		lexerConfsWithStringChecker.put(name, checker);
 	}
 
 	private String findFromText(String text, String regex) {
@@ -27,8 +32,13 @@ public class Lexer {
 	}
 
 	public Token getToken(String input){
+		for (Map.Entry conf : lexerConfsWithStringChecker.entrySet()) {
+			if (((StringCheckerBase)conf.getValue()).check(input)) {
+				return new Token((String) conf.getKey(), ((StringCheckerBase)conf.getValue()).getText(input));
+			}
+		}
 		for (Map.Entry conf : lexerConfs.entrySet()) {
-			if (!findFromText(input, conf.getKey().toString()).equals("")) {//Pattern.matches("^" + conf.getValue() + ".*", input)
+			if (!findFromText(input, conf.getKey().toString()).equals("")) {
 				return new Token((String) conf.getKey(), findFromText(input, conf.getKey().toString()));
 			}
 		}
