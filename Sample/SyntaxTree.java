@@ -20,7 +20,14 @@ public class SyntaxTree {
 	
 	public static class Text extends SyntaxTreeBase {
 		public Text(String data) {
-			this.setData(data.substring(1, data.length() - 1));
+			String value = data;
+			if (value.startsWith("\"") || value.startsWith("\'")) {
+				value = value.substring(1, value.length());
+			}
+			if (value.endsWith("\"") || value.endsWith("\'")) {
+				value = value.substring(0, value.length() - 1);
+			}
+			this.setData(value);
 			this.setType("Text");
 		}
 	}
@@ -189,12 +196,22 @@ public class SyntaxTree {
 
 		@Override
 		public Object getData() {
-			return variables.get(variableName).getData();
+			SyntaxTreeBase data = variables.get(variableName);
+			if (data != null) {
+				return data.getData();
+			}
+			System.err.println("variable " + variableName + " is not defined");
+			return new Text("None");
 		}
 
 		@Override
 		public String getType() {
-			return variables.get(variableName).getType();
+			SyntaxTreeBase data = variables.get(variableName);
+			if (data != null) {
+				return data.getType();
+			}
+			System.err.println("variable " + variableName + " is not defined");
+			return "Text";
 		}
 	}
 
