@@ -9,6 +9,7 @@ public class Sample extends CompilerBase {
 	private int lines;
 	private String fileName;
 	private HashMap<String, SyntaxTreeBase> variables = new HashMap<>();
+	private HashMap<String, SyntaxTreeBase> functions = new HashMap<>();
 	private boolean isShell;
 	
 	public int getLines() {
@@ -51,6 +52,8 @@ public class Sample extends CompilerBase {
 		lexer.add("OPERATIONS2", "\\-|\\+");
 		//spaces (ignore)
 		lexer.add("IGNORE", "[ \\s]+");
+		//function
+		lexer.add("FUNC", "function ");
 		//print
 		lexer.add("PRINT", "print ");
 		//repeat
@@ -63,6 +66,9 @@ public class Sample extends CompilerBase {
 		lexer.add("SET", "=");
 		//comment
 		lexer.add("COMMENT", new CommentStringChecker());
+		//parentheses
+		lexer.add("OPEN_PAREN", "\\(");
+		lexer.add("CLOSE_PAREN", "\\)");
 	}
 
 	public void afterLex(Parser result) {
@@ -108,6 +114,11 @@ public class Sample extends CompilerBase {
 		return new SyntaxTree.SetVariable(parser.getTokens().get(0).getText(), (SyntaxTreeBase)parser.getTokens().get(2).getObject(), variables);
 	}
 
+	@ParserEvent("program : FUNC exp program END")
+	public Object function(Parser parser) {
+		return new SyntaxTree.SetFunction(parser.getTokens().get(1).getText(), (SyntaxTreeBase)parser.getTokens().get(2).getObject(), functions);
+	}
+
 	@ParserEvent("exp : ID")
 	public Object variable(Parser parser) {
 		return new SyntaxTree.Variable(variables, parser.getTokens().get(0).getText());
@@ -116,6 +127,11 @@ public class Sample extends CompilerBase {
 	@ParserEvent("program : PRINT exp")
 	public Object print(Parser parser) {
 		return new SyntaxTree.Print(((SyntaxTreeBase)parser.getTokens().get(1).getObject()), "\n");
+	}
+
+	@ParserEvent("program : exp OPEN_PAREN CLOSE_PAREN")
+	public Object callFunction(Parser parser) {
+		return new SyntaxTree.CallFunction(parser.getTokens().get(0).getText(), functions);
 	}
 
 	@ParserEvent("program : REPEAT exp program END")
@@ -148,9 +164,11 @@ public class Sample extends CompilerBase {
 		arrayList.add("operations1");
 		arrayList.add("operations2");
 		arrayList.add("print");
-		arrayList.add("programs");
 		arrayList.add("repeat");
 		arrayList.add("set");
+		arrayList.add("programs");
+		arrayList.add("function");
+		arrayList.add("callFunction");
 		return arrayList;
 	}
 

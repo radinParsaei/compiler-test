@@ -248,7 +248,33 @@ public class SyntaxTree {
 				}
 			});
 		}
-	}	
+	}
+
+	public static class SetFunction extends SyntaxTreeBase {
+		public SetFunction(String name, SyntaxTreeBase value, HashMap functions) {
+			setRunnable(new Runnable(){
+				@Override
+				public void run() {
+					functions.put(name, value);
+				}
+			});
+		}
+	}
+
+	public static class CallFunction extends SyntaxTreeBase {
+		public CallFunction(String name, HashMap functions) {
+			setRunnable(new Runnable(){
+				@Override
+				public void run() {
+					try {
+						((SyntaxTreeBase)functions.get(name)).getRunnable().run();
+					} catch (NullPointerException e) {
+						System.err.println("Function " + name + " is not defined");
+					}
+				}
+			});
+		}
+	}
 
 	public static class Programs extends SyntaxTreeBase {
 		public Programs(SyntaxTreeBase runnable1, SyntaxTreeBase runnable2) {
