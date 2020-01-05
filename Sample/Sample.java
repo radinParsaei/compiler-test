@@ -9,19 +9,26 @@ public class Sample extends CompilerBase {
 	private int lines;
 	private String fileName;
 	private HashMap<String, SyntaxTreeBase> variables = new HashMap<>();
+	private boolean isShell;
 	
 	public int getLines() {
 		return lines;
 	}
 
-	public Sample(String fileName) {
+	public Sample(String fileName, boolean isShell) {
 		this.fileName = fileName;
-	}
-
-	public Sample() {
+		this.isShell = isShell;
 	}
 
 	public String getInputCode() {
+		if (isShell) {
+			try {
+				System.out.print("> ");
+				return new Scanner(System.in).nextLine();
+			} catch (java.util.NoSuchElementException e) {
+				System.out.println("Running file [if available] (for closing use ctrl+c)");
+			}
+		}
 		File file = new File(fileName);
 		Scanner scanner = null;
 		try {
@@ -48,6 +55,8 @@ public class Sample extends CompilerBase {
 		lexer.add("PRINT", "print ");
 		//repeat
 		lexer.add("REPEAT", "repeat ");
+		//end
+		lexer.add("END", "end");
 		//id
 		lexer.add("ID", "([A-Za-z]+\\d*_*)+");
 		//set
@@ -90,14 +99,9 @@ public class Sample extends CompilerBase {
 		return null;
 	}
 
-	@ParserEvent("program : ID SET exp")
+	@ParserEvent("program : exp SET exp")
 	public Object set(Parser parser) {
-		return new Runnable(){
-			@Override
-			public void run() {
-				variables.put(parser.getTokens().get(0).getText(), ((SyntaxTreeBase)parser.getTokens().get(2).getObject()));
-			}
-		};
+		return new SyntaxTree.SetVariable(parser.getTokens().get(0).getText(), (SyntaxTreeBase)parser.getTokens().get(2).getObject(), variables);
 	}
 
 	@ParserEvent("exp : ID")
@@ -105,45 +109,27 @@ public class Sample extends CompilerBase {
 		return new SyntaxTree.Variable(variables, parser.getTokens().get(0).getText());
 	}
 
-	@ParserEvent("program : exp")
-	public Object result(Parser parser) {
-		return new Runnable(){
-			@Override
-			public void run() {
-				System.out.println("Value is\t" + ((SyntaxTreeBase)parser.getTokens().get(0).getObject()));
-			}
-		};
-	}
-
 	@ParserEvent("program : PRINT exp")
 	public Object print(Parser parser) {
-		return new Runnable(){
-			@Override
-			public void run() {
-				System.out.println(((SyntaxTreeBase)parser.getTokens().get(1).getObject()));
-			}
-		};
+		return new SyntaxTree.Print(((SyntaxTreeBase)parser.getTokens().get(1).getObject()), "\n");
 	}
 
-	@ParserEvent("program : REPEAT exp NEW_LINE program")
+	@ParserEvent("program : REPEAT exp program END")
 	public Object repeat(Parser parser) {
-		// return new SyntaxTree.Repeat((SyntaxTreeBase) parser.getTokens().get(3).getObject(), (SyntaxTreeBase) parser.getTokens().get(1).getObject());
-		return new Runnable(){
-			@Override
-			public void run() {
-				for (int i = 0; i < Integer.parseInt(parser.getTokens().get(1).getObject().toString()); i++) {
-					((Runnable)parser.getTokens().get(3).getObject()).run();
-				}
-			}
-		};
+		return new SyntaxTree.Repeat((int)((SyntaxTreeBase)parser.getTokens().get(1).getObject()).getData(), ((SyntaxTreeBase)parser.getTokens().get(2).getObject()));
+	}
+
+	@ParserEvent("program : program program")
+	public Object programs(Parser parser) {
+		return new SyntaxTree.Programs((SyntaxTreeBase)parser.getTokens().get(0).getObject(), (SyntaxTreeBase)parser.getTokens().get(1).getObject());
 	}
 
 	public void afterParse(Parser result) {
-		result.remove("NEW_LINE");
 		for (Token token : result.getTokens()) {
 			if (token.getName().equals("program")) {
-				((Runnable)token.getObject()).run();
+				((SyntaxTreeBase)token.getObject()).getRunnable().run();
 			} else {
+				System.out.println("Syntax is:\n" + result);
 				syntaxError("Syntax Error");
 				break;
 			}
@@ -154,13 +140,13 @@ public class Sample extends CompilerBase {
 		ArrayList<String> arrayList = new ArrayList<>();
 		arrayList.add("number");
 		arrayList.add("text");
+		arrayList.add("variable");
 		arrayList.add("operations1");
 		arrayList.add("operations2");
-		arrayList.add("set");
-		arrayList.add("variable");
 		arrayList.add("print");
+		arrayList.add("programs");
 		arrayList.add("repeat");
-		arrayList.add("result");
+		arrayList.add("set");
 		return arrayList;
 	}
 
