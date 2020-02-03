@@ -173,6 +173,11 @@ public class Sample extends CompilerBase {
 	}
 
 	public static void syntaxError(int errorChar, String line) {
+		for (int i = 0; i < line.length(); i++) {
+			if (line.charAt(i) == '\n') {
+				errorChar++;
+			}
+		}
 		System.err.println(line.replace("\n", "\\n"));
 		for(; errorChar > 0; errorChar--) {
 			System.err.print(" ");
