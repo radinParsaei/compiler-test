@@ -10,12 +10,19 @@ public class Lexer {
 	private HashMap<String, String> lexerConfs = new HashMap<>();
 	private HashMap<String, StringCheckerBase> lexerConfsWithStringChecker = new HashMap<>();
 
+	private String addStrings(String... strings) {
+		StringBuilder builder = new StringBuilder();
+		for (String item: strings) {
+			builder.append(item);
+		}
+		return builder.toString();
+	}
 	public Lexer(CompilerBase compiler){
 		this.compiler = compiler;
 	}
 
 	public void add(String name, String regex){
-		lexerConfs.put(name, "(" + regex + ")");
+		lexerConfs.put(name, addStrings("(", regex, ")"));
 	}
 
 	public void add(String name, StringCheckerBase checker){
@@ -23,7 +30,7 @@ public class Lexer {
 	}
 
 	private String findFromText(String text, String regex) {
-		Pattern p = Pattern.compile("^" + lexerConfs.get(regex));
+		Pattern p = Pattern.compile(addStrings("^", lexerConfs.get(regex)));
 		Matcher m = p.matcher(text);
 		if (m.find()) {
 			return m.group(0);
@@ -38,8 +45,9 @@ public class Lexer {
 			}
 		}
 		for (Map.Entry conf : lexerConfs.entrySet()) {
-			if (!findFromText(input, conf.getKey().toString()).equals("")) {
-				return new Token((String) conf.getKey(), findFromText(input, conf.getKey().toString()));
+			String result = findFromText(input, conf.getKey().toString());
+			if (!result.equals("")) {
+				return new Token((String) conf.getKey(), result);
 			}
 		}
 		return new Token();

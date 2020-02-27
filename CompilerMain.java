@@ -2,6 +2,12 @@ import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
 
 public class CompilerMain {
+	private static boolean doubleCheck = false;
+
+	public void setDoubleCheck(boolean doubleCheck) {
+		this.doubleCheck = doubleCheck;
+	}
+
 	public static void compile(CompilerBase compiler) {
 		Parser parser = lex(compiler);
 		try {
@@ -10,7 +16,6 @@ public class CompilerMain {
 			e.printStackTrace();
 		}
 		try {
-			for (int i = 0; i < 2; i++) {
 				ArrayList<String> arrayList = (ArrayList<String>) compiler.getClass().getMethod("listAll").invoke(compiler);
 				for (String method : arrayList) {
 					String map;
@@ -18,16 +23,18 @@ public class CompilerMain {
 					parser.on(map.split(":")[1].trim(), map.split(":")[0].trim(), compiler, method);
 					compiler.parse(parser);
 				}
-			}
+				if (doubleCheck) {
+					for (String method : arrayList) {
+						String map;
+						map = compiler.getClass().getMethod(method, Parser.class).getDeclaredAnnotation(ParserEvent.class).value();
+						parser.on(map.split(":")[1].trim(), map.split(":")[0].trim(), compiler, method);
+						compiler.parse(parser);
+					}
+				}
 		} catch (IllegalArgumentException | IllegalAccessException | InvocationTargetException | NoSuchMethodException e) {
 			e.printStackTrace();
 		} catch (NullPointerException e) {
 			//Annotation ParserEvent not set for this function
-		}
-		try {
-			compiler.parse(parser);
-		} catch (Exception e) {
-			e.printStackTrace();
 		}
 		compiler.afterParse(parser);
 	}

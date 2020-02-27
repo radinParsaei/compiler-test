@@ -9,7 +9,7 @@ public class Parser {
 	public Parser(ArrayList<Token> tokens) {
 		this.tokens = tokens;
 	}
-	
+
 	public void remove(String token) {
 		for(int i = 0; i < tokens.size(); i++) {
 			if(tokens.get(i).getName().equals(token)) {
@@ -18,14 +18,14 @@ public class Parser {
 			}
 		}
 	}
-	
+
 	@Override
 	public String toString() {
-		String tmp = "";
+		StringBuilder tmp = new StringBuilder();
 		for(Token t:tokens) {
-			tmp += t + "\n";
+			tmp.append(t).append("\n");
 		}
-		return tmp;
+		return tmp.toString();
 	}
 
 	public void on(String model, String newName, CompilerLambda lambda) {//replace previous model with newName and store lambda output on it Object
@@ -40,17 +40,17 @@ public class Parser {
 				listIndex++;
 			}
 		}
-		String text = "";
+		StringBuilder text = new StringBuilder();
 		int tmp = listIndex;
 		ArrayList<Token> tmpTokens = new ArrayList<>();
 		for(int i = 0; i < model.split(" ").length; i++) {
 			tmpTokens.add(tokens.get(listIndex + i));
-			text += tokens.get(listIndex + i).getText();
+			text.append(tokens.get(listIndex + i).getText());
 			tokens.remove(listIndex + i);
 			listIndex--;
 		}
 		listIndex = tmp;
-		Token t = new Token(newName, text);
+		Token t = new Token(newName, text.toString());
 		t.setObject(lambda.run(new Parser(tmpTokens)));
 		tokens.add(listIndex, t);
 		if(map.indexOf(model) != -1) {
@@ -70,17 +70,17 @@ public class Parser {
 				listIndex++;
 			}
 		}
-		String text = "";
+		StringBuilder text = new StringBuilder();
 		int tmp = listIndex;
 		ArrayList<Token> tmpTokens = new ArrayList<>();
 		for(int i = 0; i < model.split(" ").length; i++) {
 			tmpTokens.add(tokens.get(listIndex + i));
-			text += tokens.get(listIndex + i).getText();
+			text.append(tokens.get(listIndex + i).getText());
 			tokens.remove(listIndex + i);
 			listIndex--;
 		}
 		listIndex = tmp;
-		Token t = new Token(newName, text);
+		Token t = new Token(newName, text.toString());
 		t.setObject(parentOfMethod.getClass().getMethod(methodName, Parser.class).invoke(parentOfMethod, new Parser(tmpTokens)));
 		tokens.add(listIndex, t);
 		if(map.indexOf(model) != -1) {
@@ -89,26 +89,24 @@ public class Parser {
 	}
 
 	public String getMap() {
-		String tmp = "";
+		StringBuilder tmp = new StringBuilder();
 		for(Token token : tokens) {
-			tmp += token.getName() + " ";
+			tmp.append(token.getName()).append(" ");
 		}
 		try {
 			return tmp.substring(0, tmp.length() - 1);
-		} catch(Exception e) {
-			
-		}
+		} catch(IndexOutOfBoundsException ignore) {}
 		return "";
 	}
-	
+
 	public String getTexts() {
-		String tmp = "";
+		StringBuilder tmp = new StringBuilder();
 		for(Token token : tokens) {
-			tmp += token.getText();
+			tmp.append(token.getText());
 		}
-		return tmp;
+		return tmp.toString();
 	}
-	
+
 	public ArrayList<Token> getTokens(){
 		return tokens;
 	}

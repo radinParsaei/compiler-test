@@ -17,7 +17,7 @@ public class SyntaxTree {
 			this.setType("Number");
 		}
 	}
-	
+
 	public static class Text extends SyntaxTreeBase {
 		public Text(String data) {
 			String value = data;
@@ -31,7 +31,7 @@ public class SyntaxTree {
 			this.setType("Text");
 		}
 	}
-	
+
 	public static class Plus extends SyntaxTreeBase {
 		private SyntaxTreeBase value1;
 		private SyntaxTreeBase value2;
@@ -95,7 +95,7 @@ public class SyntaxTree {
 			return this.type;
 		}
 	}
-	
+
 	public static class Multiply extends SyntaxTreeBase {
 		private SyntaxTreeBase value1;
 		private SyntaxTreeBase value2;
@@ -226,7 +226,7 @@ public class SyntaxTree {
 				}
 			});
 		}
-	}	
+	}
 
 	public static class Print extends SyntaxTreeBase {
 		public Print(SyntaxTreeBase data, String end) {
