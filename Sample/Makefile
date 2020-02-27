@@ -14,4 +14,4 @@ INF:
 	java -agentlib:native-image-agent=config-output-dir=META-INF/native-image Main samplecode
 	rm samplecode
 clean:
-	rm *.class *.jar output
+	rm *.class *.jar output ; true
