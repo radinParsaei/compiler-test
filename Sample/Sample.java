@@ -152,19 +152,19 @@ public class Sample extends CompilerBase {
 		return new SyntaxTree.Print(((SyntaxTreeBase)parser.getTokens().get(1).getObject()), "\n");
 	}
 
-	@ParserEvent(map = "program : REPEAT exp program END", priority = 8)
-	public Object repeat(Parser parser) {
-		return new SyntaxTree.Repeat((int)((SyntaxTreeBase)parser.getTokens().get(1).getObject()).getData(), ((SyntaxTreeBase)parser.getTokens().get(2).getObject()));
-	}
-
-	@ParserEvent(map = "program : exp SET exp", priority = 9)
+	@ParserEvent(map = "program : exp SET exp", priority = 8)
 	public Object set(Parser parser) {
 		return new SyntaxTree.SetVariable(parser.getTokens().get(0).getText(), (SyntaxTreeBase)parser.getTokens().get(2).getObject(), variables);
 	}
 
-	@ParserEvent(map = "program : program program", priority = 10)
+	@ParserEvent(map = "program : program program", priority = 9)
 	public Object programs(Parser parser) {
 		return new SyntaxTree.Programs((SyntaxTreeBase)parser.getTokens().get(0).getObject(), (SyntaxTreeBase)parser.getTokens().get(1).getObject());
+	}
+
+	@ParserEvent(map = "program : REPEAT exp program END", priority = 10)
+	public Object repeat(Parser parser) {
+		return new SyntaxTree.Repeat((int)((SyntaxTreeBase)parser.getTokens().get(1).getObject()).getData(), ((SyntaxTreeBase)parser.getTokens().get(2).getObject()));
 	}
 
 	@ParserEvent(map = "program : FUNC exp program END", priority = 11)
