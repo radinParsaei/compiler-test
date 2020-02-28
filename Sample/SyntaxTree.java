@@ -101,11 +101,11 @@ public class SyntaxTree {
 		private SyntaxTreeBase value2;
 
 		private String stringMultiply(String string, int times) {
-			String result = "";
+			StringBuilder result = new StringBuilder();
 			for(int i = 0; i < times; i++) {
-				result += string;
+				result.append(string);
 			}
-			return result;
+			return result.toString();
 		}
 
 		public Multiply(SyntaxTreeBase value1, SyntaxTreeBase value2) {
