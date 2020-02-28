@@ -6,5 +6,6 @@ import java.lang.annotation.Target;
 @Retention(RetentionPolicy.RUNTIME)
 @Target(ElementType.METHOD)
 @interface ParserEvent {
-	String value();
+	String map();
+	int priority();
 }

@@ -1,5 +1,5 @@
 public class Main extends CompilerMain {
-	public static void main(String [] args) {
+	public static void main(String[] args) {
 		ArgParser argParser = new ArgParser(args);
 		String fileName;
 		try {
@@ -7,7 +7,7 @@ public class Main extends CompilerMain {
 		} catch (IndexOutOfBoundsException e) {
 			fileName = "";
 		}
-		Sample sample =  new Sample(fileName, argParser.getItems().contains("shell"));
+		Sample sample = new Sample(fileName, argParser.getItems().contains("shell"));
 		do {
 			if (argParser.getItems().contains("lex")) {
 				System.out.println(lex(sample));

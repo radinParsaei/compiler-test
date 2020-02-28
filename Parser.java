@@ -6,6 +6,15 @@ public class Parser {
 		Object run(Parser tokens);
 	}
 	private ArrayList<Token> tokens;
+	private boolean singleRunPerLocation = true, singleRun = false;
+
+	public void setSingleRunPerLocation(boolean singleRunPerLocation) {
+		this.singleRunPerLocation = singleRunPerLocation;
+	}
+
+	public void setSingleRun(boolean singleRun) {
+		this.singleRun = singleRun;
+	}
 	public Parser(ArrayList<Token> tokens) {
 		this.tokens = tokens;
 	}
@@ -53,8 +62,16 @@ public class Parser {
 		Token t = new Token(newName, text.toString());
 		t.setObject(lambda.run(new Parser(tmpTokens)));
 		tokens.add(listIndex, t);
-		if(map.indexOf(model) != -1) {
-			this.on(model, newName, lambda);
+		if (!singleRun) {
+			if (singleRunPerLocation) {
+				if (map.indexOf(model, index + 1) != -1) {
+					this.on(model, newName, lambda);
+				}
+			} else {
+				if (map.indexOf(model) != -1) {
+					this.on(model, newName, lambda);
+				}
+			}
 		}
 	}
 
@@ -83,8 +100,16 @@ public class Parser {
 		Token t = new Token(newName, text.toString());
 		t.setObject(parentOfMethod.getClass().getMethod(methodName, Parser.class).invoke(parentOfMethod, new Parser(tmpTokens)));
 		tokens.add(listIndex, t);
-		if(map.indexOf(model) != -1) {
-			this.on(model, newName, parentOfMethod, methodName);
+		if (!singleRun) {
+			if (singleRunPerLocation) {
+				if (map.indexOf(model, index + 1) != -1) {
+					this.on(model, newName, parentOfMethod, methodName);
+				}
+			} else {
+				if (map.indexOf(model) != -1) {
+					this.on(model, newName, parentOfMethod, methodName);
+				}
+			}
 		}
 	}
 
