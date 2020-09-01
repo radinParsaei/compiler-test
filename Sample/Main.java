@@ -1,5 +1,6 @@
 public class Main extends CompilerMain {
 	public static void main(String[] args) {
+		setDoubleCheck(true);
 		ArgParser argParser = new ArgParser(args);
 		String fileName;
 		try {

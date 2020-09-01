@@ -12,7 +12,7 @@ public class Sample extends CompilerBase {
 	private HashMap<String, SyntaxTreeBase> functions = new HashMap<>();
 	private boolean isShell;
 	private boolean recheckOperators = false;
-	
+
 	public int getLines() {
 		return lines;
 	}
@@ -100,23 +100,23 @@ public class Sample extends CompilerBase {
 		return new SyntaxTree.Variable(variables, parser.getTokens().get(0).getText());
 	}
 
-	@ParserEvent(map = "exp : exp OPERATIONS1 OPERATIONS2 exp", priority = 3)
-	public Object operations1WithPositiveAndNegative(Parser parser) {
-		if(Pattern.matches("\\*", parser.getTokens().get(1).getText())) {
-			if (parser.getTokens().get(2).getText().equals("-")) {
-				return new SyntaxTree.Multiply((SyntaxTreeBase) parser.getTokens().get(0).getObject(), new SyntaxTree.Minus(new SyntaxTree.Number(0), (SyntaxTreeBase) parser.getTokens().get(3).getObject()));
-			} else {
-				return new SyntaxTree.Multiply((SyntaxTreeBase) parser.getTokens().get(0).getObject(), (SyntaxTreeBase) parser.getTokens().get(3).getObject());
-			}
-		} else if(Pattern.matches("/", parser.getTokens().get(1).getText())) {
-			if (parser.getTokens().get(2).getText().equals("-")) {
-				return new SyntaxTree.Division((SyntaxTreeBase) parser.getTokens().get(0).getObject(), new SyntaxTree.Minus(new SyntaxTree.Number(0), (SyntaxTreeBase) parser.getTokens().get(3).getObject()));
-			} else {
-				return new SyntaxTree.Division((SyntaxTreeBase) parser.getTokens().get(0).getObject(), (SyntaxTreeBase) parser.getTokens().get(3).getObject());
-			}
-		}
-		return null;
-	}
+	// @ParserEvent(map = "exp : exp OPERATIONS1 OPERATIONS2 exp", priority = 3)
+	// public Object operations1WithPositiveAndNegative(Parser parser) {
+	// 	if(Pattern.matches("\\*", parser.getTokens().get(1).getText())) {
+	// 		if (parser.getTokens().get(2).getText().equals("-")) {
+	// 			return new SyntaxTree.Multiply((SyntaxTreeBase) parser.getTokens().get(0).getObject(), new SyntaxTree.Minus(new SyntaxTree.Number(0), (SyntaxTreeBase) parser.getTokens().get(3).getObject()));
+	// 		} else {
+	// 			return new SyntaxTree.Multiply((SyntaxTreeBase) parser.getTokens().get(0).getObject(), (SyntaxTreeBase) parser.getTokens().get(3).getObject());
+	// 		}
+	// 	} else if(Pattern.matches("/", parser.getTokens().get(1).getText())) {
+	// 		if (parser.getTokens().get(2).getText().equals("-")) {
+	// 			return new SyntaxTree.Division((SyntaxTreeBase) parser.getTokens().get(0).getObject(), new SyntaxTree.Minus(new SyntaxTree.Number(0), (SyntaxTreeBase) parser.getTokens().get(3).getObject()));
+	// 		} else {
+	// 			return new SyntaxTree.Division((SyntaxTreeBase) parser.getTokens().get(0).getObject(), (SyntaxTreeBase) parser.getTokens().get(3).getObject());
+	// 		}
+	// 	}
+	// 	return null;
+	// }
 
 	@ParserEvent(map = "exp : exp OPERATIONS1 exp", priority = 4)
 	public Object operations1(Parser parser) {
@@ -140,6 +140,7 @@ public class Sample extends CompilerBase {
 
 	@ParserEvent(map = "exp : OPERATIONS2 exp", priority = 6)
 	public Object positiveAndNegative(Parser parser) {
+		setCounter(4);
 		recheckOperators = true;
 		if (parser.getTokens().get(0).getText().equals("-")) {
 			return new SyntaxTree.Minus(new SyntaxTree.Number(0), (SyntaxTreeBase) parser.getTokens().get(1).getObject());
@@ -201,7 +202,7 @@ public class Sample extends CompilerBase {
 		}
 		System.err.println("^");
 	}
-	
+
 	public static void syntaxError(String line) {
 		System.err.println("ERROR:\t" + line);
 	}
