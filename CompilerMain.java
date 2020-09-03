@@ -34,9 +34,10 @@ public class CompilerMain {
 					continue;
 				}
 				String map = sortedMethodsMap.get(compiler.getCounter()).getDeclaredAnnotation(ParserEvent.class).map();
+				int tmp = compiler.getCounter();
 				parser.on(map.split(":")[1].trim(), map.split(":")[0].trim(), (functionInput) -> {
 					try {
-						return sortedMethodsMap.get(compiler.getCounter()).invoke(compiler, functionInput);
+						return sortedMethodsMap.get(tmp).invoke(compiler, functionInput);
 					} catch (InvocationTargetException | IllegalAccessException e) {
 						return null;
 					}
@@ -49,9 +50,10 @@ public class CompilerMain {
 						continue;
 					}
 					String map = sortedMethodsMap.get(compiler.getCounter()).getDeclaredAnnotation(ParserEvent.class).map();
+					int tmp = compiler.getCounter();
 					parser.on(map.split(":")[1].trim(), map.split(":")[0].trim(), (functionInput) -> {
 						try {
-							return sortedMethodsMap.get(compiler.getCounter()).invoke(compiler, functionInput);
+							return sortedMethodsMap.get(tmp).invoke(compiler, functionInput);
 						} catch (InvocationTargetException | IllegalAccessException e) {
 							return null;
 						}
