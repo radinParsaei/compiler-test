@@ -1,14 +1,14 @@
 import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
-import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 public class Lexer {
 	private CompilerBase compiler;
-	private HashMap<String, String> lexerConfs = new HashMap<>();
-	private HashMap<String, StringCheckerBase> lexerConfsWithStringChecker = new HashMap<>();
+	private LinkedHashMap<String, String> lexerConfs = new LinkedHashMap<>();
+	private LinkedHashMap<String, StringCheckerBase> lexerConfsWithStringChecker = new LinkedHashMap<>();
 
 	private String addStrings(String... strings) {
 		StringBuilder builder = new StringBuilder();
