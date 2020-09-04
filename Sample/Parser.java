@@ -39,8 +39,17 @@ public class Parser {
 
 	public void on(String model, String newName, CompilerLambda lambda) {//replace previous model with newName and store lambda output on it Object
 		String map = this.getMap();
-		int index = map.indexOf(model);
-		if(index < 0) {
+		String[] models = model.split("\\|");
+		int index = 0;
+		for (int i = 0; i < models.length; i++) {
+			models[i] = models[i].trim();
+			index = map.indexOf(models[i]);
+			if (index != -1) {
+				model = models[i];
+				break;
+			}
+		}
+		if (index < 0) {
 			return;
 		}
 		int listIndex = 0;
@@ -64,12 +73,16 @@ public class Parser {
 		tokens.add(listIndex, t);
 		if (!singleRun) {
 			if (singleRunPerLocation) {
-				if (map.indexOf(model, index + 1) != -1) {
-					this.on(model, newName, lambda);
+				for (String model2 : models) {
+					if (map.indexOf(model2, index + 1) != -1) {
+						this.on(model, newName, lambda);
+					}
 				}
 			} else {
-				if (map.indexOf(model) != -1) {
-					this.on(model, newName, lambda);
+				for (String model2 : models) {
+					if (map.indexOf(model2) != -1) {
+						this.on(model, newName, lambda);
+					}
 				}
 			}
 		}
@@ -77,8 +90,17 @@ public class Parser {
 
 	public void on(String model, String newName, Object parentOfMethod, String methodName) throws IllegalAccessException, IllegalArgumentException, InvocationTargetException, NoSuchMethodException, SecurityException {//replace previous model with newName and store method output on it Object
 		String map = this.getMap();
-		int index = map.indexOf(model);
-		if(index < 0) {
+		String[] models = model.split("\\|");
+		int index = 0;
+		for (int i = 0; i < models.length; i++) {
+			models[i] = models[i].trim();
+			index = map.indexOf(models[i]);
+			if (index != -1) {
+				model = models[i];
+				break;
+			}
+		}
+		if (index < 0) {
 			return;
 		}
 		int listIndex = 0;
@@ -102,12 +124,16 @@ public class Parser {
 		tokens.add(listIndex, t);
 		if (!singleRun) {
 			if (singleRunPerLocation) {
-				if (map.indexOf(model, index + 1) != -1) {
-					this.on(model, newName, parentOfMethod, methodName);
+				for (String model2 : models) {
+					if (map.indexOf(model2, index + 1) != -1) {
+						this.on(model, newName, parentOfMethod, methodName);
+					}
 				}
 			} else {
-				if (map.indexOf(model) != -1) {
-					this.on(model, newName, parentOfMethod, methodName);
+				for (String model2 : models) {
+					if (map.indexOf(model2) != -1) {
+						this.on(model, newName, parentOfMethod, methodName);
+					}
 				}
 			}
 		}
