@@ -6,9 +6,14 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 public class Lexer {
-	private CompilerBase compiler;
-	private LinkedHashMap<String, String> lexerConfs = new LinkedHashMap<>();
-	private LinkedHashMap<String, StringCheckerBase> lexerConfsWithStringChecker = new LinkedHashMap<>();
+	private final CompilerBase compiler;
+	private boolean error = true;
+	private final LinkedHashMap<String, String> lexerConfs = new LinkedHashMap<>();
+	private final LinkedHashMap<String, StringCheckerBase> lexerConfsWithStringChecker = new LinkedHashMap<>();
+
+	public void setError(boolean error) {
+		this.error = error;
+	}
 
 	private String addStrings(String... strings) {
 		StringBuilder builder = new StringBuilder();
@@ -64,7 +69,12 @@ public class Lexer {
 			input = input.substring(token.getText().length());
 			if(previusInput.equals(input)){
 				try {
-					compiler.getClass().getMethod("syntaxError", int.class, String.class).invoke(compiler.getClass(), line.length() - input.length(), line);
+					if (error) {
+						compiler.getClass().getMethod("syntaxError", int.class, String.class).invoke(compiler.getClass(), line.length() - input.length(), line);
+					} else {
+						tokens.add(new Token("", input));
+						return tokens;
+					}
 				} catch (IllegalAccessException | InvocationTargetException | NoSuchMethodException e) {
 					e.printStackTrace();
 				}
@@ -74,3 +84,4 @@ public class Lexer {
 		return tokens;
 	}
 }
+
