@@ -5,8 +5,8 @@ public class Parser {
 	public interface CompilerLambda {
 		Object run(Parser tokens);
 	}
-	private ArrayList<Token> tokens;
-	private boolean singleRunPerLocation = true, singleRun = false;
+	private final ArrayList<Token> tokens;
+	private boolean singleRunPerLocation = true, singleRun = false, saveTexts = false;
 
 	public void setSingleRunPerLocation(boolean singleRunPerLocation) {
 		this.singleRunPerLocation = singleRunPerLocation;
@@ -14,6 +14,10 @@ public class Parser {
 
 	public void setSingleRun(boolean singleRun) {
 		this.singleRun = singleRun;
+	}
+
+	public void setSaveTexts(boolean saveTexts) {
+		this.saveTexts = saveTexts;
 	}
 	public Parser(ArrayList<Token> tokens) {
 		this.tokens = tokens;
@@ -58,17 +62,18 @@ public class Parser {
 				listIndex++;
 			}
 		}
-		StringBuilder text = new StringBuilder();
+		StringBuilder text = null;
+		if (saveTexts) text = new StringBuilder();
 		int tmp = listIndex;
 		ArrayList<Token> tmpTokens = new ArrayList<>();
 		for(int i = 0; i < model.split(" ").length; i++) {
 			tmpTokens.add(tokens.get(listIndex + i));
-			text.append(tokens.get(listIndex + i).getText());
+			if (saveTexts) text.append(tokens.get(listIndex + i).getText());
 			tokens.remove(listIndex + i);
 			listIndex--;
 		}
 		listIndex = tmp;
-		Token t = new Token(newName, text.toString());
+		Token t = new Token(newName, saveTexts? text.toString():null);
 		t.setObject(lambda.run(new Parser(tmpTokens)));
 		tokens.add(listIndex, t);
 		if (!singleRun) {
@@ -80,7 +85,7 @@ public class Parser {
 				}
 			} else {
 				for (String model2 : models) {
-					if (map.indexOf(model2) != -1) {
+					if (map.contains(model2)) {
 						this.on(model, newName, lambda);
 					}
 				}
@@ -109,17 +114,18 @@ public class Parser {
 				listIndex++;
 			}
 		}
-		StringBuilder text = new StringBuilder();
+		StringBuilder text = null;
+		if (saveTexts) text = new StringBuilder();
 		int tmp = listIndex;
 		ArrayList<Token> tmpTokens = new ArrayList<>();
 		for(int i = 0; i < model.split(" ").length; i++) {
 			tmpTokens.add(tokens.get(listIndex + i));
-			text.append(tokens.get(listIndex + i).getText());
+			if (saveTexts) text.append(tokens.get(listIndex + i).getText());
 			tokens.remove(listIndex + i);
 			listIndex--;
 		}
 		listIndex = tmp;
-		Token t = new Token(newName, text.toString());
+		Token t = new Token(newName, saveTexts? text.toString():null);
 		t.setObject(parentOfMethod.getClass().getMethod(methodName, Parser.class).invoke(parentOfMethod, new Parser(tmpTokens)));
 		tokens.add(listIndex, t);
 		if (!singleRun) {
@@ -131,7 +137,7 @@ public class Parser {
 				}
 			} else {
 				for (String model2 : models) {
-					if (map.indexOf(model2) != -1) {
+					if (map.contains(model2)) {
 						this.on(model, newName, parentOfMethod, methodName);
 					}
 				}
