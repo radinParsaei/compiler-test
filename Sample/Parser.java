@@ -42,11 +42,11 @@ public class Parser {
 	}
 
 	public void on(String model, String newName, CompilerLambda lambda) {//replace previous model with newName and store lambda output on it Object
-		String map = this.getMap();
+		String map = this.getMap() + " ";
 		String[] models = model.split("\\|");
 		int index = 0;
 		for (int i = 0; i < models.length; i++) {
-			models[i] = models[i].trim();
+			models[i] = models[i].trim() + " ";
 			index = map.indexOf(models[i]);
 			if (index != -1) {
 				model = models[i];
@@ -94,11 +94,11 @@ public class Parser {
 	}
 
 	public void on(String model, String newName, Object parentOfMethod, String methodName) throws IllegalAccessException, IllegalArgumentException, InvocationTargetException, NoSuchMethodException, SecurityException {//replace previous model with newName and store method output on it Object
-		String map = this.getMap();
+		String map = this.getMap() + " ";
 		String[] models = model.split("\\|");
 		int index = 0;
 		for (int i = 0; i < models.length; i++) {
-			models[i] = models[i].trim();
+			models[i] = models[i].trim() + " ";
 			index = map.indexOf(models[i]);
 			if (index != -1) {
 				model = models[i];
