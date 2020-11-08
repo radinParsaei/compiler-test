@@ -2,7 +2,6 @@ import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.TreeMap;
-import java.util.Map;
 import java.lang.reflect.Method;
 
 public class CompilerMain {
@@ -18,33 +17,18 @@ public class CompilerMain {
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
-		HashMap<Integer, Method> methodsMap = new HashMap<>();
-		for (Method method : compiler.getClass().getDeclaredMethods()) {
-			try {
-				methodsMap.put(method.getDeclaredAnnotation(ParserEvent.class).priority(), method);
-			} catch (NullPointerException e) {
-				//Annotation ParserEvent not set for this function
-			}
-		}
-		TreeMap<Integer, Method> sortedMethodsMap = new TreeMap<>();
-		sortedMethodsMap.putAll(methodsMap);
-		try {
-			for (compiler.setCounter(0); compiler.getCounter() <= sortedMethodsMap.size(); compiler.increaseCounter()) {
-				if (sortedMethodsMap.get(compiler.getCounter()) == null) {
-					continue;
+		if (!Targets.isWeb) {
+			HashMap<Integer, Method> methodsMap = new HashMap<>();
+			for (Method method : compiler.getClass().getDeclaredMethods()) {
+				try {
+					methodsMap.put(method.getDeclaredAnnotation(ParserEvent.class).priority(), method);
+				} catch (NullPointerException e) {
+					//Annotation ParserEvent not set for this function
 				}
-				String map = sortedMethodsMap.get(compiler.getCounter()).getDeclaredAnnotation(ParserEvent.class).map();
-				int tmp = compiler.getCounter();
-				parser.on(map.split(":")[1].trim(), map.split(":")[0].trim(), (functionInput) -> {
-					try {
-						return sortedMethodsMap.get(tmp).invoke(compiler, functionInput);
-					} catch (InvocationTargetException | IllegalAccessException e) {
-						return null;
-					}
-				});
-				compiler.parse(parser);
 			}
-			if (doubleCheck) {
+			TreeMap<Integer, Method> sortedMethodsMap = new TreeMap<>();
+			sortedMethodsMap.putAll(methodsMap);
+			try {
 				for (compiler.setCounter(0); compiler.getCounter() <= sortedMethodsMap.size(); compiler.increaseCounter()) {
 					if (sortedMethodsMap.get(compiler.getCounter()) == null) {
 						continue;
@@ -60,11 +44,30 @@ public class CompilerMain {
 					});
 					compiler.parse(parser);
 				}
+				if (doubleCheck) {
+					for (compiler.setCounter(0); compiler.getCounter() <= sortedMethodsMap.size(); compiler.increaseCounter()) {
+						if (sortedMethodsMap.get(compiler.getCounter()) == null) {
+							continue;
+						}
+						String map = sortedMethodsMap.get(compiler.getCounter()).getDeclaredAnnotation(ParserEvent.class).map();
+						int tmp = compiler.getCounter();
+						parser.on(map.split(":")[1].trim(), map.split(":")[0].trim(), (functionInput) -> {
+							try {
+								return sortedMethodsMap.get(tmp).invoke(compiler, functionInput);
+							} catch (InvocationTargetException | IllegalAccessException e) {
+								return null;
+							}
+						});
+						compiler.parse(parser);
+					}
+				}
+			} catch (IllegalArgumentException e) {
+				e.printStackTrace();
+			} catch (NullPointerException e) {
+				//Annotation ParserEvent not set for this function
 			}
-		} catch (IllegalArgumentException e) {
-			e.printStackTrace();
-		} catch (NullPointerException e) {
-			//Annotation ParserEvent not set for this function
+		} else if (doubleCheck) {
+			compiler.parse(parser);
 		}
 		compiler.afterParse(parser);
 	}
