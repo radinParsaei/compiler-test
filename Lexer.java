@@ -72,16 +72,16 @@ public class Lexer {
 					if (error) {
 						compiler.getClass().getMethod("syntaxError", int.class, String.class).invoke(compiler.getClass(), line.length() - input.length(), line);
 					} else {
-						tokens.add(new Token("", input));
-						return tokens;
+						tokens.add(new Token("", input.substring(0, 1)));
+						input = input.substring(1);
+						tokens.remove(tokens.size() - 2);
 					}
 				} catch (IllegalAccessException | InvocationTargetException | NoSuchMethodException e) {
 					e.printStackTrace();
 				}
-				return new ArrayList<Token>();
+				if (error) return new ArrayList<Token>();
 			}
 		}
 		return tokens;
 	}
 }
-
