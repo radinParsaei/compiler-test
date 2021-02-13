@@ -3,11 +3,20 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 public class Parser {
+	public void exitCheckLoop() {
+		if (parent != null) {
+			parent.isChangedSingleRun = true;
+			parent.setSingleRun(true);
+		}
+	}
+
+	private Parser parent = null;
+
 	public interface CompilerLambda {
 		Object run(Parser tokens);
 	}
 	private final ArrayList<Token> tokens;
-	private boolean singleRunPerLocation = true, singleRun = false, saveTexts = false;
+	private boolean singleRunPerLocation = true, singleRun = false, saveTexts = false, isChangedSingleRun = false;
 
 	public void setSingleRunPerLocation(boolean singleRunPerLocation) {
 		this.singleRunPerLocation = singleRunPerLocation;
@@ -43,6 +52,10 @@ public class Parser {
 	}
 
 	public void on(String model, String newName, CompilerLambda lambda) {//replace previous model with newName and store lambda output on it Object
+		if (isChangedSingleRun) {
+			isChangedSingleRun = false;
+			setSingleRun(false);
+		}
 		String map = this.getMap() + " ";
 		Pattern	pattern = Pattern.compile(model + " ");
 		Matcher matcher = pattern.matcher(map);
@@ -69,8 +82,10 @@ public class Parser {
 		}
 		listIndex = tmp;
 		Token t = new Token(newName, saveTexts? text.toString():null);
-		t.setObject(lambda.run(new Parser(tmpTokens)));
 		tokens.add(listIndex, t);
+		Parser parser = new Parser(tmpTokens);
+		parser.parent = this;
+		t.setObject(lambda.run(parser));
 		if (!singleRun) {
 			if (singleRunPerLocation) {
 				String map1 = map.substring(index);
@@ -82,6 +97,10 @@ public class Parser {
 				this.on(model, newName, lambda);
 			}
 		}
+	}
+
+	public Parser getParent() {
+		return parent;
 	}
 
 	public String getMap() {
