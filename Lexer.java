@@ -6,82 +6,87 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 public class Lexer {
-	private final CompilerBase compiler;
-	private boolean error = true;
-	private final LinkedHashMap<String, String> lexerConfs = new LinkedHashMap<>();
-	private final LinkedHashMap<String, StringCheckerBase> lexerConfsWithStringChecker = new LinkedHashMap<>();
+    private final CompilerBase compiler;
+    private boolean error = true;
+    private final LinkedHashMap<String, String> lexerConfs = new LinkedHashMap<>();
+    private final LinkedHashMap<String, StringCheckerBase> lexerConfsWithStringChecker = new LinkedHashMap<>();
 
-	public void setError(boolean error) {
-		this.error = error;
-	}
+    public void setError(boolean error) {
+        this.error = error;
+    }
 
-	private String addStrings(String... strings) {
-		StringBuilder builder = new StringBuilder();
-		for (String item: strings) {
-			builder.append(item);
-		}
-		return builder.toString();
-	}
-	public Lexer(CompilerBase compiler){
-		this.compiler = compiler;
-	}
+    private String addStrings(String... strings) {
+        StringBuilder builder = new StringBuilder();
+        for (String item : strings) {
+            builder.append(item);
+        }
+        return builder.toString();
+    }
 
-	public void add(String name, String regex){
-		lexerConfs.put(name, addStrings("(", regex, ")"));
-	}
+    public Lexer(CompilerBase compiler) {
+        this.compiler = compiler;
+    }
 
-	public void add(String name, StringCheckerBase checker){
-		lexerConfsWithStringChecker.put(name, checker);
-	}
+    public void add(String name, String regex) {
+        lexerConfs.put(name, addStrings("(", regex, ")"));
+    }
 
-	private String findFromText(String text, String regex) {
-		Pattern p = Pattern.compile(addStrings("^", lexerConfs.get(regex)));
-		Matcher m = p.matcher(text);
-		if (m.find()) {
-			return m.group(0);
-		}
-		return "";
-	}
+    public void add(String name, StringCheckerBase checker) {
+        lexerConfsWithStringChecker.put(name, checker);
+    }
 
-	public Token getToken(String input){
-		for (Map.Entry conf : lexerConfsWithStringChecker.entrySet()) {
-			if (((StringCheckerBase)conf.getValue()).check(input)) {
-				return new Token((String) conf.getKey(), ((StringCheckerBase)conf.getValue()).getText(input));
-			}
-		}
-		for (Map.Entry conf : lexerConfs.entrySet()) {
-			String result = findFromText(input, conf.getKey().toString());
-			if (!result.equals("")) {
-				return new Token((String) conf.getKey(), result);
-			}
-		}
-		return new Token();
-	}
+    private String findFromText(String text, String regex) {
+        Pattern p = Pattern.compile(addStrings("^", lexerConfs.get(regex)));
+        Matcher m = p.matcher(text);
+        if (m.find()) {
+            return m.group(0);
+        }
+        return "";
+    }
 
-	public ArrayList<Token> lex(String input){
-		String line = input;
-		String previusInput;
-		ArrayList<Token> tokens = new ArrayList<>();
-		while(input.length() != 0){
-			Token token = getToken(input);
-			tokens.add(token);
-			previusInput = input;
-			input = input.substring(token.getText().length());
-			if(previusInput.equals(input)){
-				try {
-					if (error) {
-						compiler.getClass().getMethod("syntaxError", int.class, String.class).invoke(compiler.getClass(), line.length() - input.length(), line);
-					} else {
-						tokens.add(new Token("", input.substring(0, 1)));
-						input = input.substring(1);
-						tokens.remove(tokens.size() - 2);
-					}
-				} catch (IllegalAccessException | InvocationTargetException | NoSuchMethodException e) {
-					e.printStackTrace();
-				}
-				if (error) return new ArrayList<Token>();
-			}
-		}
-		return tokens;
-	}
+    public Token getToken(String input) {
+        for (Map.Entry conf : lexerConfsWithStringChecker.entrySet()) {
+            if (((StringCheckerBase) conf.getValue()).check(input)) {
+                return new Token((String) conf.getKey(), ((StringCheckerBase) conf.getValue()).getText(input));
+            }
+        }
+        for (Map.Entry conf : lexerConfs.entrySet()) {
+            String result = findFromText(input, conf.getKey().toString());
+            if (!result.equals("")) {
+                return new Token((String) conf.getKey(), result);
+            }
+        }
+        return new Token();
+    }
+
+    public ArrayList<Token> lex(String input) {
+        String line = input;
+        String previousInput;
+        ArrayList<Token> tokens = new ArrayList<>();
+        while (input.length() != 0) {
+            Token token = getToken(input);
+            tokens.add(token);
+            previousInput = input;
+            input = input.substring(token.getText().length());
+            if (previousInput.equals(input)) {
+                if (error) {
+                    if (Targets.isWeb) {
+                        Targets.tokenizerError(line.length() - input.length(), line);
+                    } else {
+                        try {
+                            compiler.getClass().getMethod("syntaxError", int.class, String.class).invoke(compiler.getClass(), line.length() - input.length(), line);
+                        } catch (IllegalAccessException | InvocationTargetException | NoSuchMethodException e) {
+                            e.printStackTrace();
+                        }
+                    }
+                } else {
+                    tokens.add(new Token("", input.substring(0, 1)));
+                    input = input.substring(1);
+                    tokens.remove(tokens.size() - 2);
+                }
+                if (error) return new ArrayList<Token>();
+            }
+        }
+        return tokens;
+    }
 }
