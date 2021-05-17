@@ -10,7 +10,7 @@ public class CompilerMain {
 		doubleCheck = doubleCheck2;
 	}
 
-	public static void compile(CompilerBase compiler) {
+	public static Parser compile(CompilerBase compiler) {
 		Parser parser = lex(compiler);
 		try {
 			compiler.parse(parser);
@@ -70,6 +70,7 @@ public class CompilerMain {
 			compiler.parse(parser);
 		}
 		compiler.afterParse(parser);
+		return parser;
 	}
 
 	public static Parser lex(CompilerBase compiler) {
