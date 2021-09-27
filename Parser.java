@@ -11,6 +11,13 @@ public class Parser {
 	}
 
 	private Parser parent = null;
+	private int listIndex = 0;
+	private int nullResCount = 0;
+	private int from = 0;
+
+	public int getListIndex() {
+		return listIndex;
+	}
 
 	public interface CompilerLambda {
 		Object run(Parser tokens);
@@ -59,12 +66,14 @@ public class Parser {
 		String map = this.getMap() + " ";
 		Pattern	pattern = Pattern.compile(model + " ");
 		Matcher matcher = pattern.matcher(map);
-		if (!matcher.find()) {
-			return ;
+		for (int i = 0; i < nullResCount + 1; i++) {
+			if (!matcher.find()) {
+				return ;
+			}
 		}
 		String matched = matcher.group(0);
-		int index = map.indexOf(matched);
-		int listIndex = 0;
+		int index = map.indexOf(matched, from);
+		listIndex = 0;
 		for(int i = 0; i < index; i++) {
 			if(map.charAt(i) == ' ') {
 				listIndex++;
@@ -86,17 +95,30 @@ public class Parser {
 		Parser parser = new Parser(tmpTokens);
 		parser.parent = this;
 		t.setObject(lambda.run(parser));
+		if (t.getObject() == null) {
+			nullResCount++;
+			tokens.remove(listIndex);
+			int i = 0;
+			for (Token token : parser.getTokens()) {
+				tokens.add(listIndex + i++, token);
+			}
+		}
 		if (!singleRun) {
 			if (singleRunPerLocation) {
-				String map1 = map.substring(index);
-				Matcher matcher1 = pattern.matcher(map1);
-				if (matcher1.find()) {
-					this.on(model, newName, lambda);
-				}
+				try {
+					from = index + matched.length() - (matched.length() - newName.length());
+					String map1 = map.substring(from);
+					Matcher matcher1 = pattern.matcher(map1);
+					if (matcher1.find()) {
+						this.on(model, newName, lambda);
+					}
+				} catch (StringIndexOutOfBoundsException ignored) {}
 			} else {
 				this.on(model, newName, lambda);
 			}
 		}
+		nullResCount = 0;
+		from = 0;
 	}
 
 	public Parser getParent() {
