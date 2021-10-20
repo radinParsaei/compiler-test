@@ -72,7 +72,9 @@ public class Parser {
 			}
 		}
 		String matched = matcher.group(0);
-		int index = map.indexOf(matched, from);
+		int index;
+		if (nullResCount != 0) index = map.indexOf(matched, from);
+		else index = map.indexOf(matched);
 		listIndex = 0;
 		for(int i = 0; i < index; i++) {
 			if(map.charAt(i) == ' ') {
