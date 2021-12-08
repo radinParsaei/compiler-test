@@ -10,6 +10,7 @@ public class Lexer {
     private boolean error = true;
     private final LinkedHashMap<String, String> lexerConfs = new LinkedHashMap<>();
     private final LinkedHashMap<String, StringCheckerBase> lexerConfsWithStringChecker = new LinkedHashMap<>();
+    private int line = 1;
 
     public void setError(boolean error) {
         this.error = error;
@@ -47,13 +48,18 @@ public class Lexer {
     public Token getToken(String input) {
         for (Map.Entry conf : lexerConfsWithStringChecker.entrySet()) {
             if (((StringCheckerBase) conf.getValue()).check(input)) {
-                return new Token((String) conf.getKey(), ((StringCheckerBase) conf.getValue()).getText(input));
+                String text = ((StringCheckerBase) conf.getValue()).getText(input);
+                for (char c : text.toCharArray())
+                    if (c == '\n') line++;
+                return new Token((String) conf.getKey(), text, line);
             }
         }
         for (Map.Entry conf : lexerConfs.entrySet()) {
             String result = findFromText(input, conf.getKey().toString());
             if (!result.equals("")) {
-                return new Token((String) conf.getKey(), result);
+                for (char c : result.toCharArray())
+                    if (c == '\n') line++;
+                return new Token((String) conf.getKey(), result, line);
             }
         }
         return new Token();
